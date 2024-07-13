@@ -1,9 +1,22 @@
-import React from 'react'
+import axios from "axios";
+import React from "react";
 
 const App = () => {
-  return (
-    <div>App</div>
-  )
-}
+  async function s() {
+    try {
+      const res = await axios.post("http://localhost:3000/user/singup", {
+        username: "ssss",
+        email: "samir@gmail.com",
+        password: "samirsamir",
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  s();
 
-export default App
+  return <div>App</div>;
+};
+
+export default App;
