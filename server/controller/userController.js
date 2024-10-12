@@ -12,7 +12,7 @@ export async function singup(req, res) {
     const isEmailToken = await User.findOne({ email });
     const isUserToken = await User.findOne({ username });
     if (isUserToken || isEmailToken) {
-      res.status(500).send("user is allready exist !!!! ");
+      res.status(500).send("user or email is allready exist !!!! ");
       return;
     }
     const salt = await bcrypt.genSalt(10);
