@@ -1,6 +1,10 @@
 import { generateNewJwt } from "../config/jwt.js";
+import {
+  comparePasswords,
+  generatePassword,
+  generateUser,
+} from "../config/user.js";
 import User from "../models/userModel.js";
-import bcrypt from "bcryptjs";
 
 export async function singup(req, res) {
   const { username, email, password } = req.body;
@@ -15,17 +19,18 @@ export async function singup(req, res) {
       res.status(500).send("user or email is allready exist !!!! ");
       return;
     }
-    const salt = await bcrypt.genSalt(10);
-    const hashingPass = await bcrypt.hash(password, salt);
+    const hashingPass = await generatePassword(password);
     const newUser = new User({
       username,
       email,
       password: hashingPass,
     });
     const saveUser = await newUser.save();
+
     res.status(200).send({
       message: "user account is created",
-      userInfo: saveUser,
+      userInfo: generateUser(saveUser),
+      token: await generateNewJwt(saveUser.username, saveUser.email),
     });
   } catch (error) {
     console.log(error);
@@ -42,17 +47,20 @@ export async function login(req, res) {
     const userAccount = await User.findOne({
       $or: [{ username: userKey }, { email: userKey }],
     });
-    const isCorrectPasswprd = await bcrypt.compare(pass, userAccount.password);
+    if (!userAccount) {
+      res.status(404).send("user account not found");
+      return;
+    }
+    const isCorrectPasswprd = await comparePasswords(
+      userAccount.password,
+      pass
+    );
     if (!isCorrectPasswprd) {
       res.status(500).send("emai or password is incorrect");
       return;
     }
     res.status(200).send({
-      userInfo: {
-        id: userAccount._id,
-        username: userAccount.username,
-        email: userAccount.email,
-      },
+      userInfo: generateUser(userAccount),
       token: await generateNewJwt(userAccount.username, userAccount.email),
     });
   } catch (error) {
@@ -61,7 +69,7 @@ export async function login(req, res) {
   }
 }
 export async function updateAdminUser(req, res) {
-  const { userId } = req.body;
+  const { userId } = req.params;
   if (!userId) {
     res.status(404).send("user id not found");
     return;
@@ -73,10 +81,9 @@ export async function updateAdminUser(req, res) {
       return;
     }
     user.isAdmin = !user.isAdmin;
-
     const newUpdate = await user.save();
     res.status(200).send({
-      userInfo: newUpdate,
+      userInfo: generateUser(newUpdate),
       message: "user is updated",
     });
   } catch (error) {
@@ -86,7 +93,7 @@ export async function updateAdminUser(req, res) {
 }
 export async function updateUserInfo(req, res) {
   const { id } = req.params;
-  const { password, email, username } = req.body;
+  const { password, email, username, currentPassword } = req.body;
   if (!id) {
     res.status(404).send("user id is not found");
     return;
@@ -94,34 +101,57 @@ export async function updateUserInfo(req, res) {
   try {
     const userInfo = await User.findById(id);
     if (!userInfo) {
-      res.status(500).send("user not found");
+      res.status(404).send("user not found");
       return;
     }
-    if (username) {
-      const isUserToken = await User.findOne({
-        username: username,
-        _id: { $ne: id },
-      });
-      if (!isUserToken) {
-        userInfo.username = username;
-      }
-    }
+    let isUpdated = false;
     if (email) {
-      const isEmailToken = await User.findOne({
-        email,
-        _id: { $ne: id },
-      });
-      if (!isEmailToken) {
+      if (email !== userInfo.email) {
+        if (await User.findOne({ email })) {
+          res.status(500).send("email id already used");
+          return;
+        }
         userInfo.email = email;
+        isUpdated = true;
       }
     }
-    if (password) {
-      const salt = await bcrypt.genSalt();
-      const passwordHash = await bcrypt.hash(password, salt);
-      userInfo.password = passwordHash;
+    if (username) {
+      if (username !== userInfo.username) {
+        if (await User.findOne({ username })) {
+          res.status(500).send("username id already used");
+          return;
+        }
+        userInfo.username = username;
+        isUpdated = true;
+      }
+    }
+    if (password || currentPassword) {
+      if ((password && !currentPassword) || (!password && currentPassword)) {
+        res.status(500).send("passwordInfo is not complated");
+        return;
+      }
+      const isCorrectPasswprd = await comparePasswords(
+        userInfo.password,
+        currentPassword
+      );
+      if (!isCorrectPasswprd) {
+        res.status(500).send("currentPassword not correct");
+        return;
+      }
+      if (password !== currentPassword) {
+        userInfo.password = await generatePassword(password);
+        isUpdated = true;
+      }
+    }
+    if (!isUpdated) {
+      res.status(201).send("nothing new");
+      return;
     }
     const userUpdated = await userInfo.save();
-    res.status(200).send(userUpdated);
+    res.status(200).send({
+      message: "updating successfuly",
+      userInfo: generateUser(userUpdated),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send(error.message);

@@ -14,7 +14,7 @@ user.get("/", (req, res) => {
 });
 user.post("/singup", singup);
 user.get("/login", login);
-user.patch("/", updateAdminUser);
+user.patch("/:userId", updateAdminUser);
 user.put("/:id", updateUserInfo);
 
 // export routers
