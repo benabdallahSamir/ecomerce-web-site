@@ -14,7 +14,7 @@ user.get("/", (req, res) => {
   res.send("user workes");
 });
 user.post("/singup", singup);
-user.get("/login", login);
+user.post("/login", login);
 user.patch("/:userId", updateAdminUser);
 user.put("/:id", updateUserInfo);
 user.get("/isLoggin", isLoggin);

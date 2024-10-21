@@ -11,7 +11,11 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// ! write doc for this and why i use it and what need in react req to work
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 dotenv.config();
 connectDb();
 // ? routes
@@ -19,5 +23,5 @@ app.use("/user", user);
 
 // ? listenning to port
 app.listen(process.env.PORT, () => {
-  console.log(`connnecting in link : https://localhost:${process.env.PORT}`);
+  console.log(`connnecting in link : http://localhost:${process.env.PORT}`);
 });

@@ -27,9 +27,9 @@ export async function singup(req, res) {
     });
     const saveUser = await newUser.save();
     const token = await generateNewJwt(saveUser._id);
-    res.cookie("token", token);
+    res.cookie("token", token, { httpOnly: true, secure: true });
     res.status(200).send({
-      message: "user account is created",
+      isLoggin: true,
       userInfo: generateUser(saveUser),
     });
   } catch (error) {
@@ -40,7 +40,7 @@ export async function singup(req, res) {
 export async function login(req, res) {
   const { userKey, password: pass } = req.body;
   if (!userKey || !pass) {
-    req.status(500).send("informations is not completed");
+    res.status(404).send("informations is not completed");
     return;
   }
   try {
@@ -59,9 +59,11 @@ export async function login(req, res) {
       res.status(500).send("emai or password is incorrect");
       return;
     }
+    const token = await generateNewJwt(userAccount._id);
+    res.cookie("token", token, { httpOnly: true, secure: true });
     res.status(200).send({
       userInfo: generateUser(userAccount),
-      token: await generateNewJwt(userAccount._id),
+      isLoggin: true,
     });
   } catch (error) {
     console.log(error);
@@ -161,10 +163,12 @@ export async function updateUserInfo(req, res) {
 export async function isLoggin(req, res) {
   try {
     const token = req.cookies["token"];
+    console.log(req.cookies)
+    if (!token) return res.status(200).send({ isLoggin: false });
     const { id } = await decodingJwt(token);
     const exsistingUser = await User.findById(id);
     if (!exsistingUser) {
-      res.status(404).send({
+      res.status(200).send({
         isLoggin: false,
       });
       return;
