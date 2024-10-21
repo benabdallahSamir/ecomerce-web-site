@@ -3,6 +3,7 @@ import express from "express";
 import {
   login,
   singup,
+  isLoggin,
   updateAdminUser,
   updateUserInfo,
 } from "../controller/userController.js";
@@ -16,6 +17,7 @@ user.post("/singup", singup);
 user.get("/login", login);
 user.patch("/:userId", updateAdminUser);
 user.put("/:id", updateUserInfo);
+user.get("/isLoggin", isLoggin);
 
 // export routers
 export default user;

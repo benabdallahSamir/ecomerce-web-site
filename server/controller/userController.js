@@ -1,4 +1,4 @@
-import { generateNewJwt } from "../config/jwt.js";
+import { decodingJwt, generateNewJwt } from "../config/jwt.js";
 import {
   comparePasswords,
   generatePassword,
@@ -26,11 +26,11 @@ export async function singup(req, res) {
       password: hashingPass,
     });
     const saveUser = await newUser.save();
-
+    const token = await generateNewJwt(saveUser._id);
+    res.cookie("token", token);
     res.status(200).send({
       message: "user account is created",
       userInfo: generateUser(saveUser),
-      token: await generateNewJwt(saveUser.username, saveUser.email),
     });
   } catch (error) {
     console.log(error);
@@ -61,7 +61,7 @@ export async function login(req, res) {
     }
     res.status(200).send({
       userInfo: generateUser(userAccount),
-      token: await generateNewJwt(userAccount.username, userAccount.email),
+      token: await generateNewJwt(userAccount._id),
     });
   } catch (error) {
     console.log(error);
@@ -155,5 +155,26 @@ export async function updateUserInfo(req, res) {
   } catch (error) {
     console.log(error);
     res.status(500).send(error.message);
+  }
+}
+
+export async function isLoggin(req, res) {
+  try {
+    const token = req.cookies["token"];
+    const { id } = await decodingJwt(token);
+    const exsistingUser = await User.findById(id);
+    if (!exsistingUser) {
+      res.status(404).send({
+        isLoggin: false,
+      });
+      return;
+    }
+    res.status(200).send({
+      userInfo: generateUser(exsistingUser),
+      isLoggin: true,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: error.message });
   }
 }
