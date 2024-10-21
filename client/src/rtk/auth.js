@@ -3,22 +3,20 @@ import { createSlice } from "@reduxjs/toolkit";
 const auth = createSlice({
   name: "auth",
   initialState: {
-    userId: "",
-    token: "",
+    isLoggin: false,
     userInfo: {},
   },
   reducers: {
-    setUserInfo: (state, { payload: userInfo }) => {
-      state.userInfo = userInfo;
+    initAuth: (state, { payload }) => {
+      const { isLoggin, userInfo } = payload;
+      if (isLoggin) {
+        state.isLoggin = isLoggin;
+        state.userInfo = userInfo;
+      }
       return state;
-    },
-    setConfig: (state, { payload: config }) => {
-      const { token, userId } = config;
-      state.userId = userId;
-      state.token = token;
     },
   },
 });
 
 export default auth.reducer;
-export const { setUserInfo , setConfig } = auth.actions;
+export const { initAuth } = auth.actions;
