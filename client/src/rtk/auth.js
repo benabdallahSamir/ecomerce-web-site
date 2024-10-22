@@ -9,10 +9,8 @@ const auth = createSlice({
   reducers: {
     initAuth: (state, { payload }) => {
       const { isLoggin, userInfo } = payload;
-      if (isLoggin) {
-        state.isLoggin = isLoggin;
-        state.userInfo = userInfo;
-      }
+      state.isLoggin = isLoggin;
+      if (isLoggin) state.userInfo = userInfo;
       return state;
     },
   },
