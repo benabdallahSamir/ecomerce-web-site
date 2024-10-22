@@ -6,6 +6,7 @@ import {
   isLoggin,
   updateAdminUser,
   updateUserInfo,
+  logOut,
 } from "../controller/userController.js";
 // init routers
 const user = express.Router();
@@ -18,6 +19,7 @@ user.post("/login", login);
 user.patch("/:userId", updateAdminUser);
 user.put("/:id", updateUserInfo);
 user.get("/isLoggin", isLoggin);
+user.get("/logout",logOut);
 
 // export routers
 export default user;

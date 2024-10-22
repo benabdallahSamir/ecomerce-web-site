@@ -159,12 +159,13 @@ export async function updateUserInfo(req, res) {
     res.status(500).send(error.message);
   }
 }
-
 export async function isLoggin(req, res) {
   try {
     const token = req.cookies["token"];
-    console.log(req.cookies)
-    if (!token) return res.status(200).send({ isLoggin: false });
+    if (!token) {
+      res.status(200).send({ isLoggin: false });
+      return;
+    }
     const { id } = await decodingJwt(token);
     const exsistingUser = await User.findById(id);
     if (!exsistingUser) {
@@ -181,4 +182,10 @@ export async function isLoggin(req, res) {
     console.log(error);
     res.status(500).send({ message: error.message });
   }
+}
+export async function logOut(req, res) {
+  res.cookie("token", "", { httpOnly: true, secure: true });
+  res.status(200).send({
+    isLoggin: false,
+  });
 }
