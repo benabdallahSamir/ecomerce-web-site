@@ -40,7 +40,7 @@ function Login({ changepages }) {
         timer: 700,
         icon: "success",
       });
-      navigate("/");
+      navigate("/profile");
     } catch (error) {
       Swal.fire({
         title: "login error !!!",
@@ -159,7 +159,7 @@ function Singup({ changepages }) {
           reqParams
         );
         dispatch(initAuth(data));
-        navigate("/");
+        navigate("/profile");
       }
     } catch (error) {
       Swal.fire({

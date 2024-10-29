@@ -70,34 +70,15 @@ export async function login(req, res) {
     res.status(500).send(error.message);
   }
 }
-export async function updateAdminUser(req, res) {
-  const { userId } = req.params;
-  if (!userId) {
-    res.status(404).send("user id not found");
-    return;
-  }
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      res.status(500).send("user not found");
-      return;
-    }
-    user.isAdmin = !user.isAdmin;
-    const newUpdate = await user.save();
-    res.status(200).send({
-      userInfo: generateUser(newUpdate),
-      message: "user is updated",
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).send(error.message);
-  }
-}
 export async function updateUserInfo(req, res) {
   const { id } = req.params;
   const { password, email, username, currentPassword } = req.body;
   if (!id) {
     res.status(404).send("user id is not found");
+    return;
+  }
+  if (!(password && email && username && currentPassword)) {
+    res.status(500).send("all information is empty");
     return;
   }
   try {

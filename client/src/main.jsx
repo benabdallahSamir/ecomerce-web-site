@@ -12,6 +12,7 @@ export const reqParams = {
   withCredentials: true,
 };
 
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>

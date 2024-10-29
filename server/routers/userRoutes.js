@@ -4,7 +4,6 @@ import {
   login,
   singup,
   isLoggin,
-  updateAdminUser,
   updateUserInfo,
   logOut,
 } from "../controller/userController.js";
@@ -16,10 +15,9 @@ user.get("/", (req, res) => {
 });
 user.post("/singup", singup);
 user.post("/login", login);
-user.patch("/:userId", updateAdminUser);
 user.put("/:id", updateUserInfo);
 user.get("/isLoggin", isLoggin);
-user.get("/logout",logOut);
+user.get("/logout", logOut);
 
 // export routers
 export default user;
