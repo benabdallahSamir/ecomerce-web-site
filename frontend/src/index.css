@@ -10,3 +10,23 @@
 @theme {
   --color-1: #ea2e0e;
 }
+@layer {
+  body {
+    @apply !overflow-x-hidden;
+  }
+  .nav-bar {
+    @apply flex space-x-4 bg-white;
+    @apply max-md:absolute left-0 top-0 max-md:z-50;
+    @apply max-md:h-screen max-md:overflow-hidden;
+    @apply max-md:flex-col max-md:space-x-0 max-md:space-y-4 max-md:py-4 max-md:px-6;
+  }
+  .aside-bar-open {
+    @apply w-[400px] max-[400px]:w-screen;
+  }
+  .collection-section-card {
+    @apply size-full bg-cover p-5 flex; 
+    div {
+      @apply mt-auto px-3 py-1 bg-white/70 rounded text-black font-semibold;
+    }
+  }
+}
