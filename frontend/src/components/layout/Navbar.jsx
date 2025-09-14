@@ -31,7 +31,9 @@ function Navbar() {
           mobileNavBarOpen={mobileNavBarOpen}
         />
         <div className="flex space-x-4">
-          <HiOutlineUser className="w-5 h-5" />
+          <Link to="/login" className="cursor-pointer">
+            <HiOutlineUser className="w-5 h-5" />
+          </Link>
           <button
             className="relative cursor-pointer"
             onClick={() => setCardLayoutOpen((curr) => !curr)}
